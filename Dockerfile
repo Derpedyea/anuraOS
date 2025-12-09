@@ -1,6 +1,8 @@
-FROM node:22-alpine
+FROM oven/bun:1-alpine
 WORKDIR /app
+COPY package. json bun.lock* ./
+RUN bun install --frozen-lockfile
 COPY . .
-RUN bun install
+RUN bun run build || true
 EXPOSE 8000
-CMD ["node", "aboutproxy/index.js"]
+CMD ["bun", "run", "server/index.js"]
