@@ -1,4 +1,4 @@
-FROM node:22-bookworm AS builder
+FROM oven/bun:1-debian AS builder
 
 RUN apt-get update && apt-get install -y \
     make \
@@ -9,17 +9,17 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY . .
+COPY . . 
 
 RUN git submodule update --init --recursive || true
-RUN npm install
-RUN cd server && npm install
+RUN bun install
+RUN cd server && bun install
 RUN make bundle external-libs build/uv/uv. bundle.js public/config.json build/assets/matter.css build/cache-load.json || true
 
-FROM node: 22-alpine
+FROM oven/bun: 1-alpine
 WORKDIR /app
 COPY --from=builder /app . 
 WORKDIR /app/server
-RUN npm install --production
+RUN bun install --production
 EXPOSE 8000
-CMD ["node", "server.js"]
+CMD ["bun", "run", "server.js"]
